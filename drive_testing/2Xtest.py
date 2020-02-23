@@ -7,7 +7,6 @@
 
 # Import required modules
 import time
-import keyboard as kb
 import RPi.GPIO as GPIO
 import gpiozero
 import pygame
@@ -138,8 +137,8 @@ while done==False:
             textPrint.print(screen, "Axis {} value: {:>6.3f}".format(i, axis) )
         textPrint.unindent()
 
-        y = joystick.get_axis(1)
-        x = joystick.get_axis(0)
+        y = round(joystick.get_axis(1),2)
+        x = round(joystick.get_axis(0),2)
         
         #get theta d, will refer to as t, define pi
         pi=math.pi
@@ -158,28 +157,49 @@ while done==False:
             t=math.atan(y/x)+pi/2
         #case 2
         if(x>0 and y<0):
-            t=math.atan(x/(-y))
+            t=math.atan(x/-y)
         #cases 3 and 4
         tx=-x
         ty=-y
         if(tx>0 and ty>0):
-            t=2*pi-(math.atan(ty/tx)+pi/2)
-        if(x>0 and y<0):
-            t=2*pi-(math.atan(tx/(-ty)))
+            t=pi+(math.atan(ty/tx)+pi/2)
+        if(tx>0 and ty<0):
+            t=pi+(math.atan(tx/(-ty)))
         #testing
-        print(t)
+#        print(t)
         
         #for Vd, call vd, get magnitude
         vd=math.sqrt(x**2+y**2)
-        
+        if(vd>1):
+            vd=1
+        print(vd)
         #for Vtheta call vt, up to user, uses hat system, start at 0.5, TO BE IMPLEMENTED
-        vt=0.5
+        vt=0
+        t=-t
+        print(vd*math.sin(t+pi/4))
+        if(vd*math.sin(t+pi/4)+vt>0):
+            A1.forward(vd*math.sin(t+pi/4)+vt)
+        else:
+            A1.backward(abs(vd*math.sin(t+pi/4)+vt))            
+        if(vd*math.cos(t+pi/4)-vt>-0):
+            A2.forward(vd*math.cos(t+pi/4)-vt)
+        else:
+            A2.backward(abs(vd*math.cos(t+pi/4)-vt))
+        if(vd*math.cos(t+pi/4)+vt>0):
+            B2.backward(vd*math.cos(t+pi/4)+vt)
+        else:
+            B2.forward(abs(vd*math.cos(t+pi/4)+vt))
+        if(vd*math.sin(t+pi/4)-vt>0):
+            B1.backward(vd*math.sin(t+pi/4)-vt)
+        else:
+            B1.forward(abs(vd*math.sin(t+pi/4)-vt))
         
-        A1.forward(vd*math.sin(t_pi/4)+vt)
-        A2.forward(vd*math.cos(t_pi/4)-vt)
-        B2.backward(vd*math.cos(t_pi/4)+vt)
-        B3.backward(vd*math.sin(t_pi/4)-vt)
-        
+        if(vd==0):
+            A1.forward(0)
+            A2.forward(0)
+            B1.forward(0)
+            B2.forward(0)
+                    
         buttons = joystick.get_numbuttons()
         textPrint.print(screen, "Number of buttons: {}".format(buttons) )
         textPrint.indent()
@@ -215,3 +235,4 @@ while done==False:
 # If you forget this line, the program will 'hang'
 # on exit if running from IDLE.
 pygame.quit ()
+
