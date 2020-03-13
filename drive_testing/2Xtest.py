@@ -137,8 +137,8 @@ while done==False:
             textPrint.print(screen, "Axis {} value: {:>6.3f}".format(i, axis) )
         textPrint.unindent()
 
-        y = round(joystick.get_axis(1),2)
-        x = round(joystick.get_axis(0),2)
+        y = round(joystick.get_axis(1),1)
+        x = round(joystick.get_axis(0),1)
         
         #get theta d, will refer to as t, define pi
         pi=math.pi
@@ -172,29 +172,75 @@ while done==False:
         vd=math.sqrt(x**2+y**2)
         if(vd>1):
             vd=1
-        print(vd)
+
         #for Vtheta call vt, up to user, uses hat system, start at 0.5, TO BE IMPLEMENTED
         vt=0
         t=-t
-        print(vd*math.sin(t+pi/4))
+                
         if(vd*math.sin(t+pi/4)+vt>0):
-            A1.forward(vd*math.sin(t+pi/4)+vt)
+#           print("A1 Forward")
+            A1.forward(round(vd*math.sin(t+pi/4)+vt,2))
+            print(round(vd*math.sin(t+pi/4)+vt,2))
         else:
-            A1.backward(abs(vd*math.sin(t+pi/4)+vt))            
+#            print("A1 Backward")
+            A1.backward(round(abs(vd*math.sin(t+pi/4)+vt),2))
+            print(round(vd*math.sin(t+pi/4)+vt,2))
+            
         if(vd*math.cos(t+pi/4)-vt>-0):
-            A2.forward(vd*math.cos(t+pi/4)-vt)
+#            print("A2 Forward")
+            A2.forward(round(vd*math.cos(t+pi/4)-vt,2))
+            print(round(vd*math.cos(t+pi/4)-vt,2))
         else:
-            A2.backward(abs(vd*math.cos(t+pi/4)-vt))
+#            print("A2 Backward")
+            A2.backward(round(abs(vd*math.cos(t+pi/4)-vt),2))
+            print(round(vd*math.cos(t+pi/4)-vt,2))
+            
         if(vd*math.cos(t+pi/4)+vt>0):
-            B2.backward(vd*math.cos(t+pi/4)+vt)
+#            print("B2 Forward")
+            B2.backward(round(vd*math.cos(t+pi/4)+vt,2))
+            print(round(vd*math.cos(t+pi/4)+vt,2))
         else:
-            B2.forward(abs(vd*math.cos(t+pi/4)+vt))
+#            print("B2 Backward")
+            B2.forward(round(abs(vd*math.cos(t+pi/4)+vt),2))
+            print(round(vd*math.cos(t+pi/4)+vt,2))
+            
         if(vd*math.sin(t+pi/4)-vt>0):
-            B1.backward(vd*math.sin(t+pi/4)-vt)
+#            print("B1 Forward")
+            B1.backward(round(vd*math.sin(t+pi/4)-vt,2))
+            print(round(vd*math.sin(t+pi/4)-vt,2))
         else:
-            B1.forward(abs(vd*math.sin(t+pi/4)-vt))
+#            print("B1 Backward")
+            B1.forward(round(abs(vd*math.sin(t+pi/4)-vt),2))
+            print(round(vd*math.sin(t+pi/4)-vt,2))
+            
+#        print(round(vd*math.sin(t+pi/4)+vt,2))
+#        print(round(vd*math.cos(t+pi/4)-vt,2))
+#        print(round(vd*math.cos(t+pi/4)+vt,2))
+#        print(round(vd*math.sin(t+pi/4)-vt,2))
         
-        if(vd==0):
+        lb = joystick.get_button(6)
+        rb = joystick.get_button(7)
+        
+        #turning
+        print(lb)
+        print(rb)
+        if(lb!=rb):
+            if(lb==1):
+                A1.forward(1)
+                B1.forward(1)
+                B2.backward(1)
+                A2.backward(1)
+                
+#                print('lb')
+            if(rb==1):
+                A2.forward(1)
+                B2.forward(1)
+                B1.backward(1)
+                A1.backward(1)
+                
+#                print('rb')
+                
+        if(vd==0 and lb==0 and rb==0):
             A1.forward(0)
             A2.forward(0)
             B1.forward(0)
@@ -235,4 +281,3 @@ while done==False:
 # If you forget this line, the program will 'hang'
 # on exit if running from IDLE.
 pygame.quit ()
-
